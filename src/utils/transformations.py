@@ -89,7 +89,7 @@ def lead_lag_transform(bank: torch.Tensor, **kwargs) -> torch.Tensor:
     # Add lagged paths
     for i in 2*np.arange(dim):
         lagged_values           = torch.repeat_interleave(state_paths.clone(), repeats=2, dim=1)[..., int(i/2)]
-        res[..., f_ind + i ]    = lagged_values[:, :-1]
+        res[..., f_ind + i]    = lagged_values[:, :-1]
         res[..., f_ind + i + 1] = lagged_values[:, 1:]
 
     return res

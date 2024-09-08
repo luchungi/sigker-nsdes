@@ -85,7 +85,7 @@ class KernelConvolution(nn.Module):
             grid: dim_x, (possibly dim_y), dim_t, d) with d=2 or 3"""
 
         # lower and upper bounds of selected frequencies
-        freqs = [ (z0_path.size(2+i)//2 - self.modes[i]//2, z0_path.size(2+i)//2 + self.modes[i]//2) for i in range(len(self.modes)-1) ]
+        freqs = [(z0_path.size(2+i)//2 - self.modes[i]//2, z0_path.size(2+i)//2 + self.modes[i]//2) for i in range(len(self.modes)-1) ]
 
         # K_t = F_t^-1(K)  
         weights = torch.fft.ifftn(torch.fft.ifftshift(self.weights, dim=[-1]), dim=[-1], s=z0_path.size(-1))

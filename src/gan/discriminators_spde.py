@@ -27,7 +27,7 @@ def initialise_signature_kernel(**kwargs) -> sigkernel.SigKernel:
     :param kwargs:  Signature kernel kwargs, must include kernel_type and dyadic_order
     :return:        SigKernel object
     """
-    kernel_type = kwargs.get("kernel_type")
+    kernel_type  = kwargs.get("kernel_type")
     dyadic_order = kwargs.get("dyadic_order")
     sigma        = kwargs.get("sigma")
 
@@ -76,6 +76,7 @@ class PathMMDDiscriminator(KernelDiscriminator):
                 nu[..., 0] *= self._sigma    # TO CHANGE
 
         return self._metric(mu[...,0], nu[...,0])
+        # return self._metric(mu, nu)
 
 
 class SigKerMMDDiscriminator(PathMMDDiscriminator):
@@ -161,7 +162,8 @@ class SigKerMMDDiscriminator(PathMMDDiscriminator):
             return _weighted_metric
         else:
             return metric
-        
+
+
 class ExpectedSigKerScoreDiscriminator(PathMMDDiscriminator):
     """
     Discriminator that a) uses the signature kernel and b) uses a scoring rule instead of the MMD.
@@ -195,7 +197,6 @@ class ExpectedSigKerScoreDiscriminator(PathMMDDiscriminator):
 
         return initialise_signature_kernel(**self.kernel_kwargs)
 
-    
     def _init_metric(self) -> Callable:
 
         def expected_scoring_rule(X, Y, pi=None):
@@ -247,5 +248,6 @@ class ExpectedSigKerScoreDiscriminator(PathMMDDiscriminator):
             with torch.no_grad():
                 nu[..., 0] *= self._sigma    
 
-        return self._metric(mu[...,0], nu[...,0])
+        return self._metric(mu[..., 0], nu[..., 0])
+        # return self._metric(mu, nu)
     

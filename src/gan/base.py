@@ -587,7 +587,6 @@ def stopping_criterion(generated_samples, real_samples, cutoff=0.99, tol=0.05, p
     # Evaluation
 
     with torch.no_grad():
-
         real_samples           = real_samples[..., 1:].cpu()
         generated_samples      = generated_samples[..., 1:].cpu()
         n_samples, length, dim = generated_samples.size()

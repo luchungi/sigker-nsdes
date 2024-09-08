@@ -5,6 +5,9 @@ import torch
 from tqdm import tqdm
 from time import time
 
+pi = math.pi
+
+
 class Noise(object):
     
     def __init__(self, correlation = 'white', noise_size = 1):
@@ -82,12 +85,12 @@ class Noise(object):
 
 def WN_corr(x, a):
     j = 1.*torch.arange(x.shape[0]).to(x.device)
-    return torch.sqrt(2 / a) * torch.sin(j * torch.pi * x / a)
+    return torch.sqrt(2 / a) * torch.sin(j * pi * x / a)
 
 def smooth_corr(x, a, r = 2):
     my_eps=0.001
     j = 1.*torch.arange(1,x.shape[0]+1).to(x.device)
     j[-1] = 0.
     q = j**(-(2*r+1+my_eps)/2)
-    res = torch.sqrt(q)*torch.sqrt(2 / a) * torch.sin(j * torch.pi * x / a)
+    res = torch.sqrt(q)*torch.sqrt(2 / a) * torch.sin(j * pi * x / a)
     return res
