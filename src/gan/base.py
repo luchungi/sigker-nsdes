@@ -252,7 +252,7 @@ def preprocess_real_data(data_kwargs: dict, real_data_kwargs: dict):
     np_train_data = np_data[train_indexes]
     np_test_data = np_data[test_indexes]
 
-    return np_train_data, np_test_data
+    return np_train_data, np_test_data, no_null_data
 
 
 # We now batch up X and Y into feature/label pairs (though this isn't exactly what's going on)
@@ -316,7 +316,7 @@ def get_real_data(banks, batch_size, path_bank_size, device, time_add_type="basi
     # We need to batch up all the unique time vectors.
 
     if n_conditions == 1:
-        ts, ys_coeffs = get_ys_coeffs(banks[0], ts, scale, normalisation, split, initial_point)
+        ts, ys_coeffs, means, stds = get_ys_coeffs(banks[0], ts, scale, normalisation, split, initial_point)
 
         if split is not None:
             dataset = torch.utils.data.TensorDataset(*ys_coeffs)
@@ -326,10 +326,13 @@ def get_real_data(banks, batch_size, path_bank_size, device, time_add_type="basi
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
     else:
         datasets = []
+        means = []
+        stds = []
 
         for bank in banks:
-            f_ts, these_ys_coeffs = get_ys_coeffs(bank, ts, scale, normalisation, split, initial_point)
-
+            f_ts, these_ys_coeffs, mean, std = get_ys_coeffs(bank, ts, scale, normalisation, split, initial_point)
+            means.append(mean)
+            stds.append(std)
             if split is not None:
                 datasets.append(torch.utils.data.TensorDataset(*these_ys_coeffs))
                 ts = f_ts
@@ -340,7 +343,7 @@ def get_real_data(banks, batch_size, path_bank_size, device, time_add_type="basi
             ConcatDataset(*datasets), batch_size=batch_size, shuffle=True
         )
 
-    return ts, data_size, dataloader
+    return ts, data_size, dataloader, means, stds
 
 
 def get_ys_coeffs(bank, ts, scale=None, normalisation=None, split=None, initial_point=False):
@@ -400,7 +403,10 @@ def get_ys_coeffs(bank, ts, scale=None, normalisation=None, split=None, initial_
         else:
             ys_coeffs = scale_transform(ys_coeffs, scale).to(device)
 
-    return ts, ys_coeffs
+    if normalisation == 'mean_var':
+        return ts, ys_coeffs, means, stds
+    else:
+        return ts, ys_coeffs, None, None
 
 
 def get_real_conditional_training_data(path_banks, batch_size, device):
